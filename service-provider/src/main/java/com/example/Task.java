@@ -2,9 +2,17 @@ package com.example;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Version;
 
+@Entity
 public class Task {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String username;
 	private String title;
@@ -13,6 +21,7 @@ public class Task {
 	private boolean finished;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	@Version
 	private long version;
 
 	public Long getId() {

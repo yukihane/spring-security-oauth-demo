@@ -18,21 +18,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 public class TaskRestController {
 
-	private final TaskRepository repository;
+	private final TaskService service;
 
-	TaskRestController(TaskRepository repository) {
-		this.repository = repository;
+	TaskRestController(TaskService repository) {
+		this.service = repository;
 	}
 
 	@GetMapping
 	List<Task> getTasks(Principal principal) {
-		return repository.findAll(extractUsername(principal));
+		return service.findAll(extractUsername(principal));
 	}
 
 	@PostMapping
 	ResponseEntity<Void> postTask(@RequestBody Task task, Principal principal, UriComponentsBuilder uriBuilder) {
 		task.setUsername(extractUsername(principal));
-		repository.save(task);
+		service.save(null, task);
 		URI createdTaskUri = relativeTo(uriBuilder)
 				.withMethodCall(on(TaskRestController.class).getTask(task.getId(), principal)).build().encode().toUri();
 		return ResponseEntity.created(createdTaskUri).build();
@@ -40,22 +40,21 @@ public class TaskRestController {
 
 	@GetMapping("{id}")
 	Task getTask(@PathVariable long id, Principal principal) {
-		return repository.findOne(id);
+		return service.findOne(id);
 	}
 
 	@PutMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	void putTask(@PathVariable long id, @RequestBody Task task, Principal principal) {
-		repository.findOne(id);
-		task.setId(id);
-		repository.save(task);
+		service.findOne(id);
+		service.save(id, task);
 	}
 
 	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	void deleteTask(@PathVariable long id, Principal principal) {
-		repository.findOne(id);
-		repository.remove(id);
+		service.findOne(id);
+		service.remove(id);
 	}
 
 	private String extractUsername(Principal principal) {
